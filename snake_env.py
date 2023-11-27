@@ -34,6 +34,7 @@ class Snake_Env():
 			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
 		self.direction = Direction.RIGHT
 		self.score = 0
+		self.state_space = 2 ** 11 - 1
 		self.action_space = 3
 
 	def reset(self):
@@ -86,7 +87,9 @@ class Snake_Env():
 		food_up = self.food[1] < self.head()[1]
 		food_down = self.food[1] > self.head()[1]
 
-		return (self.direction, danger_straight, danger_left, danger_right, food_left, food_right, food_up, food_down)
+		state_tuple = (self.direction, danger_straight, danger_left, danger_right, food_left, food_right, food_up, food_down)
+		binary_string = ''.join('1' if bit else '0' for bit in state_tuple)
+		return int(binary_string, 2)
 
 	def step(self, action):
 		reward = 0

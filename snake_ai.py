@@ -3,17 +3,16 @@ import numpy as np
 from tqdm import tqdm
 
 env = Snake_Env()
-q_table = {}
+q_table = np.zeros((env.state_space, env.action_space))
 
 def greedy_policy(q_table, state):
-    q_values = [q_table[(state, action)] for action in range(0, env.action_space)]
-    return q_values.index(max(q_values))
+    return np.argmax(q_table[state][:])
 
 def epsilon_greedy_policy(q_table, state, epsilon):
     if random.uniform(0, 1) > epsilon:
         action = greedy_policy(q_table, state)
     else:
-        action = Action(random.randint(1, env.action_space))
+        action = random.randint(0, env.action_space-1)
     return action
 
 train_episodes = 10000
@@ -36,11 +35,8 @@ for episode in tqdm(range(train_episodes)):
 
     for step in range(max_steps):
         action = epsilon_greedy_policy(q_table, state, epsilon)
-        new_state, reward, terminated = env.step(action)
-        if (state, action) in q_table:
-            q_table[(state, action)] = q_table[(state, action)] + learning_rate * (reward + gamma * max(q_table[(state, action)] for action in env.action_space) - q_table[(state, action)])
-        else:
-            q_table[(state, action)] = learning_rate * (reward + gamma * max(q_table[(state, Action(action_int))] for action_int in range(1, env.action_space)))
+        new_state, reward, terminated = env.step(Action(action+1))
+        q_table[state][action] = q_table[state][action] + learning_rate * (reward + gamma * np.max(q_table[new_state]) - q_table[state][action])
 
         if terminated:
             break
