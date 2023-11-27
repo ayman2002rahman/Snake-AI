@@ -17,8 +17,8 @@ class Action(IntEnum):
 	LEFT = auto()
 	RIGHT = auto()
 
-BOARD_WIDTH = 50
-BOARD_HEIGHT = 50
+BOARD_WIDTH = 5
+BOARD_HEIGHT = 5
 
 class Snake_Env():
 
@@ -50,7 +50,7 @@ class Snake_Env():
 		return self.positions[-1]
 	
 	def get_board(self): #get board 2d array
-		board = [[Board.NOTHING for j in range(BOARD_HEIGHT)] for i in range(BOARD_WIDTH)]
+		board = [[Board.EMPTY for j in range(BOARD_HEIGHT)] for i in range(BOARD_WIDTH)]
 		for snake in self.positions:
 			board[snake[0]][snake[1]] = Board.SNAKE
 		board[self.food[0]][self.food[1]] = Board.FOOD
@@ -107,14 +107,16 @@ class Snake_Env():
 			new_position = (self.head()+(0,1))
 
 		if new_position is None:
-			print('uh oh')
+			print(self.direction, action)
+			raise ValueError("new position = None")
 
 		if self.collision(new_position):
+			print('dead')
 			reward = -10
 			terminated = True
 		elif new_position == self.food: # food condition here
 			reward = 10
-			score += 1
+			self.score += 1
 			self.positions.append(new_position)
 			self.generate_food()
 		else:
