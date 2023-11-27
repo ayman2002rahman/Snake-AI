@@ -1,18 +1,18 @@
-from enum import enum, auto
+from enum import IntEnum, auto
 import random
 
-class Board(Enum):
+class Board(IntEnum):
 	EMPTY = auto()
 	SNAKE = auto()
 	FOOD = auto()
 
-class Direction(Enum):
+class Direction(IntEnum):
 	LEFT = auto()
 	RIGHT = auto()
 	UP = auto()
 	DOWN = auto()
 
-class Action(Enum):
+class Action(IntEnum):
 	STRAIGHT = auto()
 	LEFT = auto()
 	RIGHT = auto()
@@ -34,6 +34,7 @@ class Snake_Env():
 			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
 		self.direction = Direction.RIGHT
 		self.score = 0
+		self.action_space = 3
 
 	def reset(self):
 		self.positions = [(BOARD_WIDTH // 2, BOARD_HEIGHT // 2)]
@@ -42,6 +43,7 @@ class Snake_Env():
 			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
 		self.direction = Direction.RIGHT
 		self.score = 0
+		return self.get_state()
 
 	def head(self):
 		return self.positions[-1]
@@ -88,27 +90,33 @@ class Snake_Env():
 
 	def step(self, action):
 		reward = 0
-		done = False
+		terminated = False
 
-		if self.direction is Direction.LEFT and action is Action.STRAIGHT or self.direction is Direction.DOWN and action is Action.RIGHT or self.direction is Direction.UP and action is Action.LEFT:
+		new_position = None
+
+		if self.direction is Direction.LEFT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.RIGHT or self.direction is Direction.UP and action == Action.LEFT:
 			new_position = (self.head()+(-1,0))
-		elif self.direction is Direction.RIGHT and action is Action.STRAIGHT or self.direction is Direction.DOWN and action is Action.LEFT or self.direction is Direction.UP and action is Action.RIGHT:
+		elif self.direction is Direction.RIGHT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.LEFT or self.direction is Direction.UP and action == Action.RIGHT:
 			new_position = (self.head()+(1,0))
-		elif self.direction is Direction.UP and action is Action.STRAIGHT or self.direction is Direction.LEFT and action is Action.RIGHT or self.direction is Direction.RIGHT and action is Action.LEFT:
+		elif self.direction is Direction.UP and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.RIGHT or self.direction is Direction.RIGHT and action == Action.LEFT:
 			new_position = (self.head()+(0,-1))
-		elif self.direction is Direction.DOWN and action is Action.STRAIGHT or self.direction is Direction.LEFT and action is Action.LEFT or self.direction is Direction.RIGHT and action is Action.RIGHT:
+		elif self.direction is Direction.DOWN and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.LEFT or self.direction is Direction.RIGHT and action == Action.RIGHT:
 			new_position = (self.head()+(0,1))
+
+		if new_position is None:
+			print('uh oh')
 
 		if self.collision(new_position):
 			reward = -10
-			done = True
+			terminated = True
 		elif new_position == self.food: # food condition here
 			reward = 10
 			score += 1
-			self.position.append(new_position)
+			self.positions.append(new_position)
 			self.generate_food()
 		else:
-			self.position.append(new_position)
-			self.pop(0)
+			self.positions.append(new_position)
+			self.positions.pop(0)
 
-		return (self.get_state(), reward, done)
+		return (self.get_state(), reward, terminated)
+	
