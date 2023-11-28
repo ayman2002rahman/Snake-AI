@@ -17,31 +17,30 @@ class Action(IntEnum):
 	LEFT = auto()
 	RIGHT = auto()
 
-BOARD_WIDTH = 5
-BOARD_HEIGHT = 5
-
 class Snake_Env():
 
 	def generate_food(self):
-		self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 		while self.food not in self.positions:
-			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 	
-	def __init__(self):
-		self.positions = [(BOARD_WIDTH // 2, BOARD_HEIGHT // 2)]
-		self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+	def __init__(self, board_width, board_height):
+		self.board_width = board_width
+		self.board_height = board_height
+		self.positions = [(self.board_width // 2, self.board_height // 2)]
+		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 		while self.food not in self.positions:
-			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 		self.direction = Direction.RIGHT
 		self.score = 0
 		self.state_space = 2 ** 11 - 1
 		self.action_space = 3
 
 	def reset(self):
-		self.positions = [(BOARD_WIDTH // 2, BOARD_HEIGHT // 2)]
-		self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+		self.positions = [(self.board_width // 2, self.board_height // 2)]
+		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 		while self.food not in self.positions:
-			self.food = (random.randint(0, BOARD_WIDTH-1), random.randint(0, BOARD_HEIGHT-1))
+			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 		self.direction = Direction.RIGHT
 		self.score = 0
 		return self.get_state()
@@ -50,14 +49,14 @@ class Snake_Env():
 		return self.positions[-1]
 	
 	def get_board(self): #get board 2d array
-		board = [[Board.EMPTY for j in range(BOARD_HEIGHT)] for i in range(BOARD_WIDTH)]
+		board = [[Board.EMPTY for j in range(self.board_height)] for i in range(self.board_width)]
 		for snake in self.positions:
 			board[snake[0]][snake[1]] = Board.SNAKE
 		board[self.food[0]][self.food[1]] = Board.FOOD
 		return board
 
 	def collision(self, position):
-		return position[0] < 0 or position[0] >= BOARD_WIDTH or position[1] < 0 or position[1] >= BOARD_HEIGHT or position in self.positions
+		return position[0] < 0 or position[0] >= self.board_width or position[1] < 0 or position[1] >= self.board_height or position in self.positions
 
 	def get_state(self):
 		left_collision = self.collision(self.head()+(-1,0))
@@ -98,20 +97,19 @@ class Snake_Env():
 		new_position = None
 
 		if self.direction is Direction.LEFT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.RIGHT or self.direction is Direction.UP and action == Action.LEFT:
-			new_position = (self.head()+(-1,0))
+			new_position = tuple(x + y for x, y in zip(self.head(), (-1, 0)))
 		elif self.direction is Direction.RIGHT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.LEFT or self.direction is Direction.UP and action == Action.RIGHT:
-			new_position = (self.head()+(1,0))
+			new_position = tuple(x + y for x, y in zip(self.head(), (1, 0)))
 		elif self.direction is Direction.UP and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.RIGHT or self.direction is Direction.RIGHT and action == Action.LEFT:
-			new_position = (self.head()+(0,-1))
+			new_position = tuple(x + y for x, y in zip(self.head(), (0, -1)))
 		elif self.direction is Direction.DOWN and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.LEFT or self.direction is Direction.RIGHT and action == Action.RIGHT:
-			new_position = (self.head()+(0,1))
+			new_position = tuple(x + y for x, y in zip(self.head(), (0, 1)))
 
 		if new_position is None:
 			print(self.direction, action)
 			raise ValueError("new position = None")
 
 		if self.collision(new_position):
-			print('dead')
 			reward = -10
 			terminated = True
 		elif new_position == self.food: # food condition here
