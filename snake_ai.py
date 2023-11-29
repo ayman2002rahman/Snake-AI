@@ -39,7 +39,7 @@ def draw_game(env, screen):
     pygame.draw.rect(screen, (0, 255, 0), (env.food[0]*CELL_SIZE, env.food[1]*CELL_SIZE, CELL_SIZE, CELL_SIZE))
     pygame.display.flip()'''
 
-def train_snake(env, q_table, train_episodes, learning_rate, max_epsilon, min_epsilon, decay_rate, gamma):
+def train_snake(env, q_table, train_episodes, max_steps, learning_rate, max_epsilon, min_epsilon, decay_rate, gamma):
     '''
     range_looper = range(train_episodes)
     if not draw:
@@ -77,16 +77,6 @@ def train_snake(env, q_table, train_episodes, learning_rate, max_epsilon, min_ep
             state = new_state
 
 #====================================================================
-train_episodes = 200000
-max_steps = 100000
-
-learning_rate = 0.9
-gamma = 0.995
-
-max_epsilon = 1
-min_epsilon = 0.1
-decay_rate = 0.00001
-
 '''
 train_snake(env, q_table, train_episodes, learning_rate, max_epsilon, min_epsilon, decay_rate, gamma, False)
 np.save('snake_q_table.npy', q_table)

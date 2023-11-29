@@ -27,7 +27,7 @@ class Snake_Env():
 	def __init__(self, board_width, board_height):
 		self.board_width = board_width
 		self.board_height = board_height
-		self.positions = [(self.board_width // 2, self.board_height // 2)]
+		self.positions = [(random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))]
 		self.generate_food()
 		self.direction = Direction(random.randint(1, 4))
 		self.score = 0
@@ -35,9 +35,9 @@ class Snake_Env():
 		self.action_space = 3
 
 	def reset(self):
-		self.positions = [(self.board_width // 2, self.board_height // 2)]
+		self.positions = [(random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))]
 		self.generate_food()
-		self.direction = Direction.RIGHT
+		self.direction = Direction(random.randint(1, 4))
 		self.score = 0
 		return self.get_state()
 
