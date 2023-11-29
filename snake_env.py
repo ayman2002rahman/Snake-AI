@@ -21,16 +21,14 @@ class Snake_Env():
 
 	def generate_food(self):
 		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
-		while self.food not in self.positions:
+		while self.food in self.positions:
 			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
 	
 	def __init__(self, board_width, board_height):
 		self.board_width = board_width
 		self.board_height = board_height
 		self.positions = [(self.board_width // 2, self.board_height // 2)]
-		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
-		while self.food not in self.positions:
-			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
+		self.generate_food()
 		self.direction = Direction.RIGHT
 		self.score = 0
 		self.state_space = 2 ** 11 - 1
@@ -38,9 +36,7 @@ class Snake_Env():
 
 	def reset(self):
 		self.positions = [(self.board_width // 2, self.board_height // 2)]
-		self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
-		while self.food not in self.positions:
-			self.food = (random.randint(0, self.board_width-1), random.randint(0, self.board_height-1))
+		self.generate_food()
 		self.direction = Direction.RIGHT
 		self.score = 0
 		return self.get_state()
@@ -98,12 +94,16 @@ class Snake_Env():
 
 		if self.direction is Direction.LEFT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.RIGHT or self.direction is Direction.UP and action == Action.LEFT:
 			new_position = tuple(x + y for x, y in zip(self.head(), (-1, 0)))
+			self.direction = Direction.LEFT
 		elif self.direction is Direction.RIGHT and action == Action.STRAIGHT or self.direction is Direction.DOWN and action == Action.LEFT or self.direction is Direction.UP and action == Action.RIGHT:
 			new_position = tuple(x + y for x, y in zip(self.head(), (1, 0)))
+			self.direction = Direction.RIGHT
 		elif self.direction is Direction.UP and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.RIGHT or self.direction is Direction.RIGHT and action == Action.LEFT:
 			new_position = tuple(x + y for x, y in zip(self.head(), (0, -1)))
+			self.direction = Direction.UP
 		elif self.direction is Direction.DOWN and action == Action.STRAIGHT or self.direction is Direction.LEFT and action == Action.LEFT or self.direction is Direction.RIGHT and action == Action.RIGHT:
 			new_position = tuple(x + y for x, y in zip(self.head(), (0, 1)))
+			self.direction = Direction.DOWN
 
 		if new_position is None:
 			print(self.direction, action)
