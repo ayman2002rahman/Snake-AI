@@ -29,7 +29,7 @@ class Snake_Env():
 		self.board_height = board_height
 		self.positions = [(self.board_width // 2, self.board_height // 2)]
 		self.generate_food()
-		self.direction = Direction.RIGHT
+		self.direction = Direction(random.randint(1, 4))
 		self.score = 0
 		self.state_space = 2 ** 11 - 1
 		self.action_space = 3
