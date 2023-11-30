@@ -5,7 +5,7 @@ from tqdm import tqdm
 from snake_env import Action, Snake_Env
 from snake_ai import greedy_policy
 
-env = Snake_Env(20, 20)
+env = Snake_Env(60, 35)
 
 CELL_SIZE = 20
 DISPLAY_SIZE = (env.board_width*CELL_SIZE, env.board_height*CELL_SIZE)
@@ -30,7 +30,7 @@ def evaluate(env, q_table, eval_episodes, max_steps, draw):
         state = env.reset()
         terminated = False
 
-        for step in range(max_steps):
+        while True:
 
             if draw:
                 for event in pygame.event.get():
@@ -49,5 +49,5 @@ def evaluate(env, q_table, eval_episodes, max_steps, draw):
 
             state = new_state
 
-q_table = np.load('snake_q_table.npy')
-evaluate(env, q_table, 50, 10, True)
+q_table = np.load('snake_q_table_v2.npy')
+evaluate(env, q_table, 50, 100000, True)

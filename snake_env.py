@@ -31,7 +31,7 @@ class Snake_Env():
 		self.generate_food()
 		self.direction = Direction(random.randint(1, 4))
 		self.score = 0
-		self.state_space = 2 ** 11 - 1
+		self.state_space = 2 ** 9
 		self.action_space = 3
 
 	def reset(self):
@@ -61,18 +61,26 @@ class Snake_Env():
 		down_collsion = self.collision(self.head()+(0,1))
 
 		if self.direction is Direction.LEFT:
+			directional_twos_digit = 0
+			directional_ones_digit = 0
 			danger_straight = left_collision
 			danger_left = down_collsion
 			danger_right = up_collision
 		elif self.direction is Direction.RIGHT:
+			directional_twos_digit = 0
+			directional_ones_digit = 1
 			danger_straight = right_collision
 			danger_left = up_collision
 			danger_right = down_collsion
 		elif self.direction is Direction.UP:
+			directional_twos_digit = 1
+			directional_ones_digit = 0
 			danger_straight = up_collision
 			danger_left = left_collision
 			danger_right = right_collision
 		elif self.direction is Direction.DOWN:
+			directional_twos_digit = 1
+			directional_ones_digit = 1
 			danger_straight = down_collsion
 			danger_left = right_collision
 			danger_right = left_collision
@@ -82,7 +90,7 @@ class Snake_Env():
 		food_up = self.food[1] < self.head()[1]
 		food_down = self.food[1] > self.head()[1]
 
-		state_tuple = (self.direction, danger_straight, danger_left, danger_right, food_left, food_right, food_up, food_down)
+		state_tuple = (directional_twos_digit, directional_ones_digit, danger_straight, danger_left, danger_right, food_left, food_right, food_up, food_down)
 		binary_string = ''.join('1' if bit else '0' for bit in state_tuple)
 		return int(binary_string, 2)
 
