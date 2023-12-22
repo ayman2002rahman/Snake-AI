@@ -1,33 +1,33 @@
 import pygame
 import sys
+import yaml
 import numpy as np
 from tqdm import tqdm
 from snake_env import Action, Snake_Env
 from snake_ai import train_snake
 
-env = Snake_Env(10, 10)
-q_table = np.zeros((env.state_space, env.action_space))
-q_table = np.random.rand(env.state_space, env.action_space)
+#q_table = np.zeros((env.state_space, env.action_space))
+#q_table = np.random.rand(env.state_space, env.action_space)
+q_table = np.load('snake_q_table_v4.npy')
 
-CELL_SIZE = 20
-DISPLAY_SIZE = (env.board_width*CELL_SIZE, env.board_height*CELL_SIZE)
+with open('hyperparameters.yaml', 'r') as stream:
+    try:
+        hyperparameters = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
 
-'''
-pygame.init()
-screen = pygame.display.set_mode(DISPLAY_SIZE)
-pygame.display.set_caption("Snake AI")
-clock = pygame.time.Clock()'''
+env = Snake_Env(hyperparameters['train_env_size']['width'], hyperparameters['train_env_size']['height'])
 
-train_episodes = 1000000
-max_steps = 100000
+train_episodes = hyperparameters['train_episodes']
+max_steps = hyperparameters['max_steps']
 
-learning_rate = 0.9
-gamma = 0.995
+learning_rate = hyperparameters['learning_rate']
+gamma = hyperparameters['gamma']
 
-max_epsilon = 1
-min_epsilon = 0.1
-decay_rate = 0.000005
+max_epsilon = hyperparameters['max_epsilon']
+min_epsilon = hyperparameters['min_epsilon']
+decay_rate = hyperparameters['decay_rate']
 
 train_snake(env, q_table, train_episodes, max_steps, learning_rate, max_epsilon, min_epsilon, decay_rate, gamma)
-np.save('snake_q_table_v2.npy', q_table)
+np.save(hyperparameters['train_q_table'], q_table)
 print(np.max(q_table))

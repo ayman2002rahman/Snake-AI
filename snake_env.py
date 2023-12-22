@@ -55,10 +55,10 @@ class Snake_Env():
 		return position[0] < 0 or position[0] >= self.board_width or position[1] < 0 or position[1] >= self.board_height or position in self.positions
 
 	def get_state(self):
-		left_collision = self.collision(self.head()+(-1,0))
-		right_collision = self.collision(self.head()+(1,0))
-		up_collision = self.collision(self.head()+(0,-1))
-		down_collsion = self.collision(self.head()+(0,1))
+		left_collision = self.collision(tuple(x + y for x, y in zip(self.head(), (-1, 0))))
+		right_collision = self.collision(tuple(x + y for x, y in zip(self.head(), (1, 0))))
+		up_collision = self.collision(tuple(x + y for x, y in zip(self.head(), (0, -1))))
+		down_collsion = self.collision(tuple(x + y for x, y in zip(self.head(), (0, 1))))
 
 		if self.direction is Direction.LEFT:
 			directional_twos_digit = 0
